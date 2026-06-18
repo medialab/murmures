@@ -1,0 +1,36 @@
+/**
+ * GENERAL
+ */
+
+:root {
+  --font: "Noto Sans", sans-serif;
+  --mono: "Anonymous Pro", monospace;
+}
+
+section {
+  font-family: var(--mono);
+  break-after: always;
+}
+
+@page {
+  margin : 3cm;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font);
+  margin: 0;
+}
+h1 {
+  margin-top: 0.25cm;
+  margin-bottom: 0.25cm;
+}
+p:first-of-type {
+  margin-top: 1cm;
+}
+
+p {
+  font-size: 17px;
+}
+p:last-of-type {
+  margin-bottom: 1cm;
+}
