@@ -4,7 +4,9 @@ import fs from 'fs';
 import { markdown } from 'markdown';
 import { execute } from 'html2thermal';
 import buffer from 'buffer'
-import { printerName } from '../config.json';
+import config from '../config.json' with {type: "json"};
+
+const { printerName } = config;
 
 const postScriptText = markdown.toHTML(fs.readFileSync('resources/postscript.md', 'utf-8'));
 

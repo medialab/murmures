@@ -78,3 +78,28 @@ lpstat -p -d
 
 Then in `config.json` modify `printerName` accordingly.
 
+On debian/raspberry PI, you also have to set your keyboard capture mode to X11:
+
+````
+Advanced Options
+→ Wayland
+→ X11
+→ Reboot
+````
+
+Then :
+
+````
+Advanced Options
+→ Wayland
+→ X11
+→ Reboot
+````
+
+# Usage
+
+```
+npm start
+npm html # generate html paginated document of public stories
+npm server # serve webserver with html paginated document of public stories
+```

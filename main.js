@@ -3,7 +3,8 @@ import fm from 'front-matter';
 import recorder from 'node-record-lpcm16';
 import colors from 'colors';
 
-import { GlobalKeyboardListener } from "node-global-key-listener";
+import { GlobalKeyboardListener } from "keyspy";
+
 import { getAudioDurationInSeconds } from 'get-audio-duration';
 
 import player from './lib/player.js'
@@ -17,7 +18,7 @@ import {
   KEYS_MAN
 } from './constants.js'
 
-const keyboardListener = new GlobalKeyboardListener();
+const keyboard = new GlobalKeyboardListener();
 const { readdir, statSync, readFileSync, existsSync, ensureDir, writeFile, remove } = fs;
 
 const USE_PRINTER = true;
@@ -79,13 +80,16 @@ const setPlayer = (player) => {
   }
 }
 
-keyboardListener.addListener(async function (e, down) {
+keyboard.addListener(async function (e, down) {
+  // console.log({
+  //   name: event.name,
+  //   state: event.state,
+  //   raw: event.rawKey?._nameRaw,
+  //   vKey: event.rawKey?.vKey,
+  //   downKeys: Object.keys(down || {}).filter((key) => down[key]),
+  // });
   const { activeMode } = state;
   if (e.state === 'UP' && reverseKeysMap[e.name]) {
-
-    // if (state.player) {
-    //   state.player.kill();
-    // }
 
     const action = reverseKeysMap[e.name];
     switch (action) {
