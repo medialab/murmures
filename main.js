@@ -193,7 +193,7 @@ const listener = await startKeyboardListener({
               } else if (activeMode === MODES.RECORDING) {
                 const stories = await discoverStories();
 
-                const highestId = Math.max(...stories.map(a => +a.id));
+                const highestId = stories.length ? Math.max(...stories.map(a => +a.id)) : -1;
                 const id = (highestId + 1 + '').padStart(3, "0");
 
                 const intro = await player('resources/nqn_avant_enregistrement.wav');
@@ -221,7 +221,14 @@ const listener = await startKeyboardListener({
                 await writeFile(`stories/${folderName}/metadata.md`, jsToFrontMatter(metadata), 'utf8');
                 const file = fs.createWriteStream(`stories/${folderName}/audio.wav`, { encoding: 'binary' })
                 const recording = recorder.record({
-                  sampleRate: 44100
+                  // sampleRate: 44100,
+                  recorder: process.platform === 'linux' ? 'arecord' : undefined,
+                  device: `plughw:${config.recordCard},0`,
+                  sampleRate: 16000,
+                  channels: 1,
+                  audioType: 'wav',
+                  threshold: 0,
+                  verbose: true,
                 })
                 recording.stream()
                   .pipe(file);

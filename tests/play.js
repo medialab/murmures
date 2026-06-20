@@ -13,6 +13,6 @@
 
 import play from "../lib/player.js";
 
-const audio = await play("tests/test.wav")
+const audio = await play("resources/nqn_avant_enregistrement.wav")
 console.log(audio)
 setTimeout(() => audio.kill(), 4000)

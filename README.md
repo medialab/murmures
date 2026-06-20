@@ -46,7 +46,7 @@ sudo cp /etc/cups/cupsd.conf /etc/cups/cupsd.conf.original
 sudo chmod a-w /etc/cups/cupsd.conf.original
 
 # audio recording
-sudo apt-get install sox
+sudo apt install -y alsa-utils sox libsox-fmt-all
 
 # clone repo
 git clone https://github.com/medialab/murmures.git
@@ -106,7 +106,7 @@ You should also on debian identify the proper audio output:
 aplay -l
 ```
 
-Then modify `config.json` `audioCard` by setting the proper number.
+Then modify `config.json` `audioCard` by setting the proper number. You can try different cards with the script `tests/play.js`
 
 # Usage
 

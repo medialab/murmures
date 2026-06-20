@@ -10,7 +10,6 @@ const recording = recorder.record({
 recording.stream()
 .pipe(file)
 
-
 // Stop recording after three seconds
 setTimeout(function () {
   recording.stop();
