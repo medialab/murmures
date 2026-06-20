@@ -4,6 +4,7 @@ import fs from 'fs';
 import { markdown } from 'markdown';
 import { execute } from 'html2thermal';
 import buffer from 'buffer'
+import { printerName } from '../config.json';
 
 const postScriptText = markdown.toHTML(fs.readFileSync('resources/postscript.md', 'utf-8'));
 
@@ -14,7 +15,7 @@ const postScriptText = markdown.toHTML(fs.readFileSync('resources/postscript.md'
 const printer = new ThermalPrinter({
   type: PrinterTypes.EPSON,                                  // Printer type: 'star' or 'epson'
   width: 48,                                                // Number of characters in one line
-  interface: 'printer:EPSON_TM_T20II_imp_therm_emmaus_connect', // 'tcp://xxx.xxx.xxx.xxx',                       // Printer interface
+  interface: `printer:${printerName}`, // 'tcp://xxx.xxx.xxx.xxx',                       // Printer interface
   characterSet: CharacterSet.PC852_LATIN2,  // Printer character set
   driver,
   removeSpecialCharacters: false,                           // Removes special characters - default: false
