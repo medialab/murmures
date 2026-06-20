@@ -1,4 +1,4 @@
 {
   "printerName": "EPSON_TM_T20II_imp_therm_emmaus_connect",
-  "keyboardDevice": "event4"
+  "keyboardDevice": "/dev/input/event4"
 }
