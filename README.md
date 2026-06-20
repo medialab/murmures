@@ -151,6 +151,19 @@ Then paste:
 ```
 #!/bin/bash
 
+
+export NVM_DIR="/home/rawbin/.nvm"
+
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+  . "$NVM_DIR/nvm.sh"
+else
+  echo "nvm introuvable dans $NVM_DIR"
+  read
+  exit 1
+fi
+
+nvm use 20
+
 cd /home/rawbin/murmures || exit 1
 
 echo "Lancement de Murmures..."
