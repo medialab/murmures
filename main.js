@@ -138,6 +138,10 @@ const listener = await startKeyboardListener({
                 setActiveMode(MODES.PLAYING);
               }
               if (activeMode === MODES.PLAYING || activeMode === MODES.STANDBY) {
+                if (!allStories.length) {
+                  console.log(colors.red('No stories to play'));
+                  return;
+                }
                 if (state.availableStories.length === 0) {
                   state.availableStories = [...allStories.filter(f => f.status === STATUSES.SHAREABLE)];
                 }
