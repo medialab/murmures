@@ -131,6 +131,12 @@ alsamixer
 
 Then F6 > select your output (eg USB audio) > augment the sound > esc.
 
+Then:
+
+```
+sudo alsactl store
+```
+
 
 # Usage
 
@@ -150,6 +156,31 @@ Then paste:
 
 ```
 #!/bin/bash
+
+echo "Réglage du volume de toutes les cartes son..."
+
+if command -v pactl >/dev/null 2>&1; then
+  pactl list short sinks | awk '{print $1}' | while read -r sink; do
+    echo "Réglage sink Pulse/PipeWire: $sink"
+    pactl set-sink-mute "$sink" 0 2>/dev/null || true
+    pactl set-sink-volume "$sink" 100% 2>/dev/null || true
+  done
+fi
+
+if command -v amixer >/dev/null 2>&1 && command -v aplay >/dev/null 2>&1; then
+  aplay -l | awk -F'[: ]+' '/^card /{print $2}' | sort -nu | while read -r card; do
+    echo "Réglage carte ALSA: $card"
+
+    amixer -c "$card" scontrols \
+      | sed -n "s/Simple mixer control '\([^']*\)'.*/\1/p" \
+      | while read -r control; do
+          if amixer -c "$card" sget "$control" 2>/dev/null | grep -q "Playback"; then
+            echo "  -> $control à 100%"
+            amixer -c "$card" sset "$control" 100% unmute >/dev/null 2>&1 || true
+          fi
+        done
+  done
+fi
 
 
 export NVM_DIR="/home/rawbin/.nvm"
