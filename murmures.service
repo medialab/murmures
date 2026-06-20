@@ -1,0 +1,16 @@
+[Unit]
+Description=Murmures Node App
+After=network.target
+
+[Service]
+Type=simple
+User=rawbin
+WorkingDirectory=/home/rawbin/murmures
+ExecStart=/home/rawbin/.nvm/versions/node/v20.20.2/bin/npm start
+Restart=always
+RestartSec=5
+Environment=NODE_ENV=production
+Environment=PATH=/home/rawbin/.nvm/versions/node/v20.20.2/bin:/usr/local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=multi-user.target
