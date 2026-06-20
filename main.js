@@ -2,9 +2,9 @@ import fs, { exists } from 'fs-extra';
 import fm from 'front-matter';
 import recorder from 'node-record-lpcm16';
 import colors from 'colors';
-
-
 import { getAudioDurationInSeconds } from 'get-audio-duration';
+
+import config from "./config.json" with {type: "json"};
 
 import { startKeyboardListener } from "./lib/keyboardListener.js";
 import player from './lib/player.js'
@@ -81,7 +81,7 @@ const setPlayer = (player) => {
 
 
 const listener = await startKeyboardListener({
-  devicePath: process.env.KEYBOARD_DEVICE,
+  devicePath: process.platform === "linux" ? config.keyboardDevice || process.env.KEYBOARD_DEVICE : undefined,
 
   onKey(e) {
     return new Promise(async () => {

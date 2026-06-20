@@ -1,11 +1,12 @@
 import { startKeyboardListener } from "../lib/keyboardListener.js";
+import config from "../config.json" with {type: "json"};
 
 console.log(`Platform: ${process.platform}`);
 console.log(`Arch: ${process.arch}`);
 console.log("Appuie sur ESCAPE pour quitter.");
 
 const listener = await startKeyboardListener({
-  devicePath: process.env.KEYBOARD_DEVICE,
+  devicePath: process.platform === "linux" ? config.keyboardDevice || process.env.KEYBOARD_DEVICE : undefined,
 
   onKey(event) {
     console.log({
