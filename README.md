@@ -45,6 +45,9 @@ sudo apt install cups
 sudo cp /etc/cups/cupsd.conf /etc/cups/cupsd.conf.original
 sudo chmod a-w /etc/cups/cupsd.conf.original
 
+# audio recording
+sudo apt-get install sox
+
 # clone repo
 git clone https://github.com/medialab/murmures.git
 cd murmures

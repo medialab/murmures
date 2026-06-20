@@ -168,7 +168,7 @@ const listener = await startKeyboardListener({
                 //     state.player.kill();
                 //   }
                 //   console.log(`message de fin`);
-                //   const msg = await player('resources/nqn_fin_histoire.mp3');
+                //   const msg = await player('resources/nqn_fin_histoire.wav');
                 //   setPlayer(msg);
                 //   await new Promise((resolve) => {
                 //     setTimeout(() => {
@@ -196,7 +196,7 @@ const listener = await startKeyboardListener({
                 const highestId = Math.max(...stories.map(a => +a.id));
                 const id = (highestId + 1 + '').padStart(3, "0");
 
-                const intro = await player('resources/nqn_avant_enregistrement.mp3');
+                const intro = await player('resources/nqn_avant_enregistrement.wav');
                 setPlayer(intro);
                 console.log(colors.green(`lecture de l'intro de ${parseInt(intro.duration)} s`));
                 await new Promise((resolve) => {
