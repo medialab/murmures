@@ -107,7 +107,7 @@ const listener = await startKeyboardListener({
               console.log('combiné raccroché')
               // setActiveMode(MODES.STANDBY);
               if (state.player) {
-                state.player.kill();
+                await state.player.kill();
               }
               if (state.recording) {
                 console.log(`arrêt de l'enregistrement`);

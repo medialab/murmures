@@ -79,7 +79,7 @@ lpstat -p -d
 
 Then in `config.json` modify `printerName` accordingly.
 
-On debian/raspberry PI, you also have to set your keyboard capture mode to X11:
+On debian/raspberry PI, you may also have to set your keyboard capture mode to X11:
 
 ````
 Advanced Options
@@ -96,6 +96,14 @@ Advanced Options
 → X11
 → Reboot
 ````
+
+You should also on debian identify the proper audio output:
+
+```
+aplay -l
+```
+
+Then modify `config.json` `audioCard` by setting the proper number.
 
 # Usage
 
