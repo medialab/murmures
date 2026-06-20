@@ -30,6 +30,8 @@ sudo apt-get install git-lfs # git large file system
 # install whisper
 mkdir -p models/Xenova
 git clone https://huggingface.co/Xenova/whisper-small models/Xenova/whisper-small
+git clone https://huggingface.co/Xenova/whisper-tiny models/Xenova/whisper-tiny
+git clone https://huggingface.co/Xenova/whisper-base models/Xenova/whisper-base
 
 # install nvm – comment if you already have it
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.5/install.sh | bash
@@ -70,6 +72,12 @@ npm install
 ```
 
 ## After installation
+
+Copy config file:
+
+```
+cp config.sample.json config.json
+```
 
 Find the name of the printer you are going to use.
 
