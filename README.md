@@ -106,7 +106,16 @@ You should also on debian identify the proper audio output:
 aplay -l
 ```
 
-Then modify `config.json` `audioCard` by setting the proper number. You can try different cards with the script `tests/play.js`
+Then modify `config.json` `audioCard` by setting the proper number. You can try different cards with the script `tests/play.js`.
+
+Same thing for the recorder:
+
+```
+aplay -l
+```
+
+Then modify `config.json` `recordCard` by setting the proper number. You can try different cards with the script `tests/record.js`.
+
 
 # Usage
 

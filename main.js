@@ -7,6 +7,7 @@ import { getAudioDurationInSeconds } from 'get-audio-duration';
 import config from "./config.json" with {type: "json"};
 
 import { startKeyboardListener } from "./lib/keyboardListener.js";
+import { createRecording } from './lib/recorder.js';
 import player from './lib/player.js'
 import { jsToFrontMatter, discoverStories } from './lib/misc.js';
 import transcriber from './lib/transcriber.js';
@@ -219,19 +220,21 @@ const listener = await startKeyboardListener({
                   status: STATUSES.PRIVATE
                 }
                 await writeFile(`stories/${folderName}/metadata.md`, jsToFrontMatter(metadata), 'utf8');
-                const file = fs.createWriteStream(`stories/${folderName}/audio.wav`, { encoding: 'binary' })
-                const recording = recorder.record({
-                  // sampleRate: 44100,
-                  recorder: process.platform === 'linux' ? 'arecord' : undefined,
-                  device: `plughw:${config.recordCard},0`,
-                  sampleRate: 16000,
-                  channels: 1,
-                  audioType: 'wav',
-                  threshold: 0,
-                  verbose: true,
-                })
-                recording.stream()
-                  .pipe(file);
+                const recording = createRecording(`stories/${folderName}/audio.wav`);
+
+                // const file = fs.createWriteStream(`stories/${folderName}/audio.wav`, { encoding: 'binary' })
+                // const recording = recorder.record({
+                //   // sampleRate: 44100,
+                //   recorder: process.platform === 'linux' ? 'arecord' : undefined,
+                //   device: `plughw:${config.recordCard},0`,
+                //   sampleRate: 16000,
+                //   channels: 1,
+                //   audioType: 'wav',
+                //   threshold: 0,
+                //   verbose: true,
+                // })
+                // recording.stream()
+                //   .pipe(file);
                 state.recording = recording;
                 state.activeRecordingFolderName = folderName;
               }
