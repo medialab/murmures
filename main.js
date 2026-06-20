@@ -3,10 +3,10 @@ import fm from 'front-matter';
 import recorder from 'node-record-lpcm16';
 import colors from 'colors';
 
-import { GlobalKeyboardListener } from "keyspy";
 
 import { getAudioDurationInSeconds } from 'get-audio-duration';
 
+import { startKeyboardListener } from "./lib/keyboardListener.js";
 import player from './lib/player.js'
 import { jsToFrontMatter, discoverStories } from './lib/misc.js';
 import transcriber from './lib/transcriber.js';
@@ -18,7 +18,6 @@ import {
   KEYS_MAN
 } from './constants.js'
 
-const keyboard = new GlobalKeyboardListener();
 const { readdir, statSync, readFileSync, existsSync, ensureDir, writeFile, remove } = fs;
 
 const USE_PRINTER = true;
@@ -34,7 +33,7 @@ const printMan = () => {
         const expl = KEYS_MAN[mode];
         return `${key}: ${expl}`
       }).join('\n')
-    )
+  )
   )
   console.log(colors.blue('==='));
 
@@ -80,165 +79,177 @@ const setPlayer = (player) => {
   }
 }
 
-keyboard.addListener(async function (e, down) {
-  // console.log({
-  //   name: event.name,
-  //   state: event.state,
-  //   raw: event.rawKey?._nameRaw,
-  //   vKey: event.rawKey?.vKey,
-  //   downKeys: Object.keys(down || {}).filter((key) => down[key]),
-  // });
-  const { activeMode } = state;
-  if (e.state === 'UP' && reverseKeysMap[e.name]) {
 
-    const action = reverseKeysMap[e.name];
-    switch (action) {
-      case 'HANGON':
-        if (state.isActive) {
-          console.log('combiné raccroché')
-          // setActiveMode(MODES.STANDBY);
-          if (state.player) {
-            state.player.kill();
-          }
-          if (state.recording) {
-            console.log(`arrêt de l'enregistrement`);
-            await state.recording.stop();
-            state.recording = undefined;
-            console.log(`début de la transcription`);
-            const audioPath = `stories/${state.activeRecordingFolderName}/audio.wav`;
-            const duration = await getAudioDurationInSeconds(audioPath);
-            const { transcription = '' } = await transcriber(audioPath);
-            await fs.writeFile(`stories/${state.activeRecordingFolderName}/_transcription_auto.txt`, transcription.trim(), 'utf8')
-            await fs.writeFile(`stories/${state.activeRecordingFolderName}/transcription_partageable.txt`, transcription.trim(), 'utf8')
-            const metadata = fm(fs.readFileSync(`stories/${state.activeRecordingFolderName}/metadata.md`, 'utf8')).attributes;
-            metadata.duration = duration;
-            await writeFile(`stories/${state.activeRecordingFolderName}/metadata.md`, jsToFrontMatter(metadata), 'utf8');
-            if (USE_PRINTER) {
-              console.log(colors.green('impression du résultat'));
-              printPrivatePart(metadata, transcription.trim());
+const listener = await startKeyboardListener({
+  devicePath: process.env.KEYBOARD_DEVICE,
+
+  onKey(e) {
+    return new Promise(async () => {
+      console.log({
+        key: e.key,
+        state: e.state,
+        code: e.code,
+        source: e.source,
+      });
+
+      if (e.key === "ESCAPE" && e.state === "DOWN") {
+        console.log("Arrêt.");
+        listener.stop();
+        process.exit(0);
+      }
+      const { activeMode } = state;
+      if (e.state === 'UP' && reverseKeysMap[e.key]) {
+
+        const action = reverseKeysMap[e.key];
+        switch (action) {
+          case 'HANGON':
+            if (state.isActive) {
+              console.log('combiné raccroché')
+              // setActiveMode(MODES.STANDBY);
+              if (state.player) {
+                state.player.kill();
+              }
+              if (state.recording) {
+                console.log(`arrêt de l'enregistrement`);
+                await state.recording.stop();
+                state.recording = undefined;
+                console.log(`début de la transcription`);
+                const audioPath = `stories/${state.activeRecordingFolderName}/audio.wav`;
+                const duration = await getAudioDurationInSeconds(audioPath);
+                const { transcription = '' } = await transcriber(audioPath);
+                await fs.writeFile(`stories/${state.activeRecordingFolderName}/_transcription_auto.txt`, transcription.trim(), 'utf8')
+                await fs.writeFile(`stories/${state.activeRecordingFolderName}/transcription_partageable.txt`, transcription.trim(), 'utf8')
+                const metadata = fm(fs.readFileSync(`stories/${state.activeRecordingFolderName}/metadata.md`, 'utf8')).attributes;
+                metadata.duration = duration;
+                await writeFile(`stories/${state.activeRecordingFolderName}/metadata.md`, jsToFrontMatter(metadata), 'utf8');
+                if (USE_PRINTER) {
+                  console.log(colors.green('impression du résultat'));
+                  printPrivatePart(metadata, transcription.trim());
+                }
+
+                printMan();
+                state.freshRecordMode = true;
+              }
+              state.isActive = false;
+            } else {
+              console.log('combiné décroché')
+              state.isActive = true;
+              if (activeMode === MODES.STANDBY) {
+                setActiveMode(MODES.PLAYING);
+              }
+              if (activeMode === MODES.PLAYING || activeMode === MODES.STANDBY) {
+                if (state.availableStories.length === 0) {
+                  state.availableStories = [...allStories.filter(f => f.status === STATUSES.SHAREABLE)];
+                }
+
+                const randomStoryIndex = parseInt(Math.random() * state.availableStories.length);
+                const storyToPlay = state.availableStories[randomStoryIndex];
+                // console.log(storyToPlay)
+                state.availableStories = state.availableStories.filter((_s, i) => i !== randomStoryIndex);
+                if (state.player) {
+                  state.player.kill();
+                }
+                const storyPlayer = await player(`${storyToPlay.basePath}/audio.wav`);
+                setPlayer(storyPlayer);
+                console.log(`lecture de l'histoire ${storyToPlay.id} (${storyToPlay.title}) – ${parseInt(storyPlayer.duration)} secondes`);
+                await new Promise((resolve) => {
+                  setTimeout(() => {
+                    resolve();
+                  }, storyPlayer.duration * 1000)
+                });
+                console.log('histoire finie')
+                // @todo système de réponse
+                // if (state.isActive) {
+                //     if (state.player) {
+                //     state.player.kill();
+                //   }
+                //   console.log(`message de fin`);
+                //   const msg = await player('resources/nqn_fin_histoire.mp3');
+                //   setPlayer(msg);
+                //   await new Promise((resolve) => {
+                //     setTimeout(() => {
+                //       resolve();
+                //     }, msg.duration * 1000)
+                //   })
+                //   console.log('la suite')
+                // }
+
+              } else if (activeMode === MODES.REPLAYING) {
+                if (state.freshRecordMode && state.activeRecordingFolderName) {
+                  const draft = await player(`stories/${state.activeRecordingFolderName}/audio.wav`);
+                  setPlayer(draft);
+                  console.log('lecture du replay d\'une durée de ', draft.duration);
+                  await new Promise((resolve) => {
+                    setTimeout(() => {
+                      resolve();
+                    }, draft.duration * 1000)
+                  });
+                  printMan();
+                }
+              } else if (activeMode === MODES.RECORDING) {
+                const stories = await discoverStories();
+
+                const highestId = Math.max(...stories.map(a => +a.id));
+                const id = (highestId + 1 + '').padStart(3, "0");
+
+                const intro = await player('resources/nqn_avant_enregistrement.mp3');
+                setPlayer(intro);
+                console.log(colors.green(`lecture de l'intro de ${parseInt(intro.duration)} s`));
+                await new Promise((resolve) => {
+                  setTimeout(() => {
+                    resolve();
+                  }, intro.duration * 1000 - 2 * 1000)
+                })
+                console.log(`début de l'enregistrement`);
+
+                const dateRedux = new Date().toISOString().split('T')[0].replace(/-/g, '');
+                console.log(dateRedux);
+                console.log('id', id)
+                const folderName = `${id}_${dateRedux}`;
+                await ensureDir(`stories/${folderName}`);
+                const metadata = {
+                  date: new Date().toISOString(),
+                  id,
+                  duration: '',
+                  title: '',
+                  status: STATUSES.PRIVATE
+                }
+                await writeFile(`stories/${folderName}/metadata.md`, jsToFrontMatter(metadata), 'utf8');
+                const file = fs.createWriteStream(`stories/${folderName}/audio.wav`, { encoding: 'binary' })
+                const recording = recorder.record({
+                  sampleRate: 44100
+                })
+                recording.stream()
+                  .pipe(file);
+                state.recording = recording;
+                state.activeRecordingFolderName = folderName;
+              }
             }
-            
-            printMan();
-            state.freshRecordMode = true;
-          }
-          state.isActive = false;
-        } else {
-          console.log('combiné décroché')
-          state.isActive = true;
-          if (activeMode === MODES.STANDBY) {
+            break;
+          case 'PLAYMODE':
             setActiveMode(MODES.PLAYING);
-          }
-          if (activeMode === MODES.PLAYING || activeMode === MODES.STANDBY) {
-            if (state.availableStories.length === 0) {
-              state.availableStories = [...allStories.filter(f => f.status === STATUSES.SHAREABLE)];
-            }
-
-            const randomStoryIndex = parseInt(Math.random() * state.availableStories.length);
-            const storyToPlay = state.availableStories[randomStoryIndex];
-            // console.log(storyToPlay)
-            state.availableStories = state.availableStories.filter((_s, i) => i !== randomStoryIndex);
-            if (state.player) {
-              state.player.kill();
-            }
-            const storyPlayer = await player(`${storyToPlay.basePath}/audio.wav`);
-            setPlayer(storyPlayer);
-            console.log(`lecture de l'histoire ${storyToPlay.id} (${storyToPlay.title}) – ${parseInt(storyPlayer.duration)} secondes`);
-            await new Promise((resolve) => {
-              setTimeout(() => {
-                resolve();
-              }, storyPlayer.duration * 1000)
-            });
-            console.log('histoire finie')
-            // @todo système de réponse
-            // if (state.isActive) {
-            //     if (state.player) {
-            //     state.player.kill();
-            //   }
-            //   console.log(`message de fin`);
-            //   const msg = await player('resources/nqn_fin_histoire.mp3');
-            //   setPlayer(msg);
-            //   await new Promise((resolve) => {
-            //     setTimeout(() => {
-            //       resolve();
-            //     }, msg.duration * 1000)
-            //   })
-            //   console.log('la suite')
-            // }
-
-          } else if (activeMode === MODES.REPLAYING) {
+            break;
+          case 'RECMODE':
+            setActiveMode(MODES.RECORDING);
+            break;
+          case 'REPLAYMODE':
+            setActiveMode(MODES.REPLAYING);
+            break;
+          case 'DELETE':
             if (state.freshRecordMode && state.activeRecordingFolderName) {
-              const draft = await player(`stories/${state.activeRecordingFolderName}/audio.wav`);
-              setPlayer(draft);
-              console.log('lecture du replay d\'une durée de ', draft.duration);
-              await new Promise((resolve) => {
-                setTimeout(() => {
-                  resolve();
-                }, draft.duration * 1000)
-              });
-              printMan();
+              console.log(`suppression du dossier ${state.activeRecordingFolderName}`)
+              await remove(`stories/${state.activeRecordingFolderName}`)
+              state.freshRecordMode = undefined;
+              state.activeRecordingFolderName = undefined;
             }
-          } else if (activeMode === MODES.RECORDING) {
-            const stories = await discoverStories();
-
-            const highestId = Math.max(...stories.map(a => +a.id));
-            const id = (highestId + 1 + '').padStart(3, "0");
-
-            const intro = await player('resources/nqn_avant_enregistrement.mp3');
-            setPlayer(intro);
-            console.log(colors.green(`lecture de l'intro de ${parseInt(intro.duration)} s`));
-            await new Promise((resolve) => {
-              setTimeout(() => {
-                resolve();
-              }, intro.duration * 1000 - 2 * 1000)
-            })
-            console.log(`début de l'enregistrement`);
-            
-            const dateRedux = new Date().toISOString().split('T')[0].replace(/-/g, '');
-            console.log(dateRedux);
-            console.log('id', id)
-            const folderName = `${id}_${dateRedux}`;
-            await ensureDir(`stories/${folderName}`);
-            const metadata = {
-              date: new Date().toISOString(),
-              id,
-              duration: '',
-              title: '',
-              status: STATUSES.PRIVATE
-            }
-            await writeFile(`stories/${folderName}/metadata.md`, jsToFrontMatter(metadata), 'utf8');
-            const file = fs.createWriteStream(`stories/${folderName}/audio.wav`, { encoding: 'binary' })
-            const recording = recorder.record({
-              sampleRate: 44100
-            })
-            recording.stream()
-              .pipe(file);
-            state.recording = recording;
-            state.activeRecordingFolderName = folderName;
-          }
+            break;
+          default:
+            break;
         }
-        break;
-      case 'PLAYMODE':
-        setActiveMode(MODES.PLAYING);
-        break;
-      case 'RECMODE':
-        setActiveMode(MODES.RECORDING);
-        break;
-      case 'REPLAYMODE':
-        setActiveMode(MODES.REPLAYING);
-        break;
-      case 'DELETE':
-        if (state.freshRecordMode && state.activeRecordingFolderName) {
-          console.log(`suppression du dossier ${state.activeRecordingFolderName}`)
-          await remove(`stories/${state.activeRecordingFolderName}`)
-          state.freshRecordMode = undefined;
-          state.activeRecordingFolderName = undefined;
-        }
-        break;
-      default:
-        break;
-    }
-  }
-  // console.log(
-  //     `${e.name} ${e.state == "DOWN" ? "DOWN" : "UP  "} [${e.rawKey._nameRaw}]`
-  // );
-}); 
+      }
+    })
+
+  },
+});
+
+process.stdin.resume();

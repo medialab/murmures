@@ -1,23 +1,26 @@
-import { GlobalKeyboardListener } from "keyspy";
+import { startKeyboardListener } from "../lib/keyboardListener.js";
 
-const keyboard = new GlobalKeyboardListener();
+console.log(`Platform: ${process.platform}`);
+console.log(`Arch: ${process.arch}`);
+console.log("Appuie sur ESCAPE pour quitter.");
 
-console.log("Démarrage du listener clavier global…");
-console.log("Appuie sur ESC pour quitter.");
+const listener = await startKeyboardListener({
+  devicePath: process.env.KEYBOARD_DEVICE,
 
-keyboard.addListener((event, down) => {
-  console.log({
-    name: event.name,
-    state: event.state,
-    raw: event.rawKey?._nameRaw,
-    vKey: event.rawKey?.vKey,
-    downKeys: Object.keys(down || {}).filter((key) => down[key]),
-  });
+  onKey(event) {
+    console.log({
+      key: event.key,
+      state: event.state,
+      code: event.code,
+      source: event.source,
+    });
 
-  if (event.name === "ESCAPE" && event.state === "DOWN") {
-    console.log("Arrêt.");
-    process.exit(0);
-  }
+    if (event.key === "ESCAPE" && event.state === "DOWN") {
+      console.log("Arrêt.");
+      listener.stop();
+      process.exit(0);
+    }
+  },
 });
 
 process.stdin.resume();

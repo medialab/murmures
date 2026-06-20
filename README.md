@@ -38,6 +38,7 @@ nvm install 20
 nvm use 20
 # keyboard
 sudo apt-get install -y libxkbcommon-x11-0
+sudo apt install -y evtest
 # cups related
 sudo apt install build-essential python3 make g++ pkg-config cups libcups2-dev
 sudo apt install cups
