@@ -139,3 +139,62 @@ npm start
 npm html # generate html paginated document of public stories
 npm server # serve webserver with html paginated document of public stories
 ```
+
+# Setup services for launching at startup on a raspberry pi
+
+```
+nano /home/rawbin/start-murmures.sh
+```
+
+Then paste:
+
+```
+#!/bin/bash
+
+cd /home/rawbin/murmures || exit 1
+
+echo "Lancement de Murmures..."
+echo "Répertoire courant : $(pwd)"
+echo "Node : $(which node)"
+echo "npm : $(which npm)"
+echo
+
+nvm use 20
+npm start
+
+echo
+echo "Le script s'est arrêté."
+echo "Appuie sur Entrée pour fermer ce terminal."
+read
+```
+
+Then:
+
+```
+chmod +x /home/rawbin/start-murmures.sh
+```
+
+Then:
+
+```
+mkdir -p /home/rawbin/.config/autostart
+nano /home/rawbin/.config/autostart/murmures.desktop
+```
+
+Then paste:
+
+```
+[Desktop Entry]
+Type=Application
+Name=Murmures
+Comment=Lance Murmures dans un terminal au démarrage
+Exec=lxterminal --title="Murmures" -e bash -lc "/home/rawbin/start-murmures.sh"
+Terminal=false
+X-GNOME-Autostart-enabled=true
+```
+
+Then:
+
+```
+chmod +x /home/rawbin/.config/autostart/murmures.desktop
+```
