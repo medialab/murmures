@@ -3,7 +3,6 @@
 
 # Installation (WIP)
 
-
 On mac:
 
 ```sh
@@ -115,6 +114,14 @@ aplay -l
 ```
 
 Then modify `config.json` `recordCard` by setting the proper number. You can try different cards with the script `tests/record.js`.
+
+If sound is too low:
+
+````
+alsamixer
+```
+
+Then F6 > select your output (eg USB audio) > augment the sound > esc.
 
 
 # Usage
