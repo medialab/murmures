@@ -111,10 +111,10 @@ const listener = await startKeyboardListener({
                 await state.player.kill();
               }
               if (state.recording) {
-                console.log(`arrêt de l'enregistrement`);
+                console.log(colors.blue(`arrêt de l'enregistrement`));
                 await state.recording.stop();
                 state.recording = undefined;
-                console.log(`début de la transcription`);
+                console.log(colors.blue(`début de la transcription`));
                 const audioPath = `stories/${state.activeRecordingFolderName}/audio.wav`;
                 const duration = await getAudioDurationInSeconds(audioPath);
                 const { transcription = '' } = await transcriber(audioPath);
