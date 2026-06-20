@@ -139,13 +139,14 @@ const listener = await startKeyboardListener({
                 setActiveMode(MODES.PLAYING);
               }
               if (activeMode === MODES.PLAYING || activeMode === MODES.STANDBY) {
-                if (!allStories.length) {
+                if (!allStories.length || !allStories.filter(f => f.status === STATUSES.SHAREABLE).length) {
                   console.log(colors.red('No stories to play'));
                   return;
                 }
                 if (state.availableStories.length === 0) {
                   state.availableStories = [...allStories.filter(f => f.status === STATUSES.SHAREABLE)];
                 }
+
 
                 const randomStoryIndex = parseInt(Math.random() * state.availableStories.length);
                 const storyToPlay = state.availableStories[randomStoryIndex];
@@ -154,7 +155,7 @@ const listener = await startKeyboardListener({
                 if (state.player) {
                   state.player.kill();
                 }
-                const storyPlayer = await player(`${storyToPlay.basePath}/audio.wav`);
+                const storyPlayer = await player(`${storyToPlay?.basePath}/audio.wav`);
                 setPlayer(storyPlayer);
                 console.log(`lecture de l'histoire ${storyToPlay.id} (${storyToPlay.title}) – ${parseInt(storyPlayer.duration)} secondes`);
                 await new Promise((resolve) => {
