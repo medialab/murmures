@@ -182,6 +182,21 @@ if command -v amixer >/dev/null 2>&1 && command -v aplay >/dev/null 2>&1; then
   done
 fi
 
+echo "Amplification de toutes les sorties Pulse/PipeWire..."
+
+if command -v pactl >/dev/null 2>&1; then
+  pactl list short sinks | awk '{print $1}' | while read -r sink; do
+    echo "Sink $sink à 150%"
+    pactl set-sink-mute "$sink" 0 2>/dev/null || true
+    pactl set-sink-volume "$sink" 150% 2>/dev/null || true
+  done
+fi
+
+if command -v wpctl >/dev/null 2>&1; then
+  wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 2>/dev/null || true
+  wpctl set-volume @DEFAULT_AUDIO_SINK@ 1.5 2>/dev/null || true
+fi
+
 
 export NVM_DIR="/home/rawbin/.nvm"
 
