@@ -138,31 +138,33 @@ npm server # serve webserver with html paginated document of public stories
 
 # Setup services for launching at startup on a raspberry pi
 
+Paste the following line in your terminal (replace `replace_with_your_username` with your linux username):
+
 ```sh
-nano /home/rawbin/start-murmures.sh
+nano /home/replace_with_your_username/start-murmures.sh
 ```
 
-Then paste `start-murmures.sh` content into it (replace `replace_with_your_username` with your username).
+Then paste `start-murmures.sh` file content into it (replace `replace_with_your_username` with your username – `whoami` if you're not sure).
 
-Then give it execution rights:
+Then give the script file execution rights:
 
 ```sh
-chmod +x /home/rawbin/start-murmures.sh
+chmod +x /home/replace_with_your_username/start-murmures.sh
 ```
 
 Then create an autostart script:
 
 ```sh
-mkdir -p /home/rawbin/.config/autostart
-nano /home/rawbin/.config/autostart/murmures.desktop
+mkdir -p /home/replace_with_your_username/.config/autostart
+nano /home/replace_with_your_username/.config/autostart/murmures.desktop
 ```
 
-Then paste the content of `autostart-murmures.desktop` (replace `replace_with_your_username` with your username).
+Then paste the content of `autostart-murmures.desktop` (replace `replace_with_your_username` with your linux username).
 
-Then give it execution rights:
+Then give the autostart script execution rights:
 
 ```sh
-chmod +x /home/rawbin/.config/autostart/murmures.desktop
+chmod +x /home/replace_with_your_username/.config/autostart/murmures.desktop
 ```
 
 You're done!
