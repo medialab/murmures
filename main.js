@@ -123,9 +123,9 @@ const listener = await startKeyboardListener({
                 const metadata = fm(fs.readFileSync(`stories/${state.activeRecordingFolderName}/metadata.md`, 'utf8')).attributes;
                 metadata.duration = duration;
                 await writeFile(`stories/${state.activeRecordingFolderName}/metadata.md`, jsToFrontMatter(metadata), 'utf8');
-                if (USE_PRINTER) {
+                if (config.usePrinter !== undefined ? config.usePrinter : true) {
                   console.log(colors.green('impression du résultat'));
-                  printPrivatePart(metadata, transcription.trim());
+                  printPrivatePart(metadata, transcription.trim(), config.printLegal !== undefined ? config.printLegal : true);
                 }
 
                 printMan();

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Murmures
+Comment=Lance Murmures dans un terminal au démarrage
+Exec=lxterminal --title="Murmures" -e bash -lc "/home/replace_with_your_username/start-murmures.sh"
+Terminal=false
+X-GNOME-Autostart-enabled=true
