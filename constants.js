@@ -42,18 +42,18 @@ export const STATUSES = {
 // }
 
 export const KEYS_MAP = {
-  HANGON: 'RETURN',
-  PLAYMODE: 'U',
-  RECMODE: 'I',
-  REPLAYMODE: 'O',
-  DELETE: 'P'
+  // HANGON: 'RETURN',
+  // PLAYMODE: 'U',
+  // RECMODE: 'I',
+  // REPLAYMODE: 'O',
+  // DELETE: 'P'
 
 
-  // HANGON: 'NUMPAD 0',
-  // PLAYMODE: 'NUMPAD 1',
-  // RECMODE: 'NUMPAD 2',
-  // REPLAYMODE: 'NUMPAD 3',
-  // DELETE: 'NUMPAD 9'
+  HANGON: 'NUMPAD 0',
+  PLAYMODE: 'NUMPAD 1',
+  RECMODE: 'NUMPAD 2',
+  REPLAYMODE: 'NUMPAD 3',
+  DELETE: 'NUMPAD 9'
 }
 export const KEYS_MAN = {
   HANGON: 'décrocher ou raccrocher',
