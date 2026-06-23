@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node main.js",
+    "dev": "nodemon main.js --ignore stories",
     "html": "node makeHTML.js",
     "serve": "live-server"
   },
@@ -28,6 +29,7 @@
     "node-thermal-printer": "^4.6.0",
     "play-sound": "^1.1.6",
     "printer": "^0.4.0",
+    "redux": "^5.0.1",
     "sound-play": "^1.1.0",
     "wavefile": "^11.0.0"
   }
