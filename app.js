@@ -109,6 +109,9 @@ function mainReducer(state = initialState, action) {
       return newState;
 
     case SET_PLAYER:
+      if (newState.player) {
+        newState.player.kill();
+      }
       return {
         ...newState,
         player: payload
@@ -133,6 +136,8 @@ function mainReducer(state = initialState, action) {
           newState.phoneStatus = PHONE_STATUSES.RECORDING;
         } else if (state.phoneStatus === PHONE_STATUSES.DELETING) {
           newState.phoneStatus = PHONE_STATUSES.RECORDING_IDLE;
+        } else if (state.phoneStatus === PHONE_STATUSES.RELISTENING) {
+          newState.phoneStatus = PHONE_STATUSES.POST_RECORDING;
         }
       }
 
@@ -312,7 +317,9 @@ store.subscribe(async () => {
         store.dispatch({ type: END_OF_AUDIO, payload: thatPath })
       }, storyPlayer.duration * 1000);
       // hang on after recording and processing finished
-    } else if (oldState?.phoneIsActive === false && newState.phoneStatus === PHONE_STATUSES.POST_RECORDING) {
+    } else if (
+      (oldState?.phoneIsActive === false  || oldState?.phoneStatus !== PHONE_STATUSES.POST_RECORDING)
+      && newState.phoneStatus === PHONE_STATUSES.POST_RECORDING) {
       if (newState.player) {
         newState.player.kill();
       }
